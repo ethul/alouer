@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="_src"/>
+	<classpathentry kind="src" path="_test"/>
+	<classpathentry kind="con" path="ch.epfl.lamp.sdt.launching.SCALA_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="lib" path="/home/ethul/workspace/alouer/_lib/tagsoup-1.2.jar"/>
+	<classpathentry kind="lib" path="/home/ethul/workspace/alouer/_lib/scalatest-1.2-for-scala-2.8.0.RC3-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="/home/ethul/workspace/alouer/_lib/gdata-2.2.1-alpha.jar"/>
+	<classpathentry kind="output" path="_output"/>
+</classpath>
