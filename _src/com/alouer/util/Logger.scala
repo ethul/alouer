@@ -10,7 +10,7 @@ import java.io.FileWriter
  *
  */
 object Logger {
-  private[this] val logfile = "/tmp/alouer.log"
+  private[this] val logfile = "/home/ethul/tmp/alouer.log"
   private[this] val appender = new FileWriter(logfile, true)
 
   def log(level: Level)(content: String) {

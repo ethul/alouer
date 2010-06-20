@@ -29,11 +29,11 @@ www.stanfor</p>
     assert(expected == result)
   }
 
-  private class MockRssParser(geocoder: Geocoder) extends RssParser(geocoder) {
-    def parse(rss: Elem): Seq[MapMarker] = {
-      null
-    }
-    
-    def testRemoveEscapes(value: String) = removeEscapes(value)
+  private class MockRssParser(geocoder: Geocoder) extends RssParser(geocoder, null, null) {
+    def parseAddress(item: String): String = ""
+    def dateKey(): String = "mock"
+    def tallyItems(tally: Int) { }
+    def tallyNewItems(tally: Int) { }
+    def testRemoveEscapes(value: String) = removeNonPrintables(value)
   }
 }

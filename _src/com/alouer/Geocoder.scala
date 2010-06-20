@@ -3,7 +3,7 @@
  */
 package com.alouer
 
-import com.alouer.util.Logger
+import com.alouer.util.{Logger,Statistics}
 import scala.xml.{Elem,XML}
 import java.net.{URL,URLEncoder}
 
@@ -19,17 +19,22 @@ class Geocoder(geocache: Geocache) {
   private[this] val sensorParam = "sensor=false"
   private[this] val ok = "OK"
   private[this] val encoding = "utf-8"
-   
+  private[this] val unknownLat = "0"
+  private[this] val unknownLng = "0"
+
   def encode(address: String): Geolocation = {
+    Statistics.incGeoAttempts
     if (address == null || address == "") {
-      warninglog("address is null or empty")
-      Geolocation("0","0")
+      warninglog("address is null or empty, setting to unknown lat lng of 0")
+      Geolocation(unknownLat, unknownLng)
     }
     else if (geocache.contains(address)) {
       infolog("cache hit: " + address)
+      Statistics.incGeocacheHits
       geocache.get(address).get
     }
     else {
+      Statistics.incGeoLookups
       val geolocation = lookup(address)
       geocache.put(address, geolocation)
       infolog("added: " + address + " => " + geolocation)
@@ -54,7 +59,8 @@ class Geocoder(geocache: Geocache) {
     }
     else {
       warninglog("status " + status + " for " + address)
-      throw new IllegalArgumentException()
+      warninglog("setting unknown lat lng of 0")
+      Geolocation(unknownLat, unknownLng)
     }
   }
   
