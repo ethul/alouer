@@ -33,7 +33,7 @@ case class Geopolygon(geopoints: List[Geolocatable]) extends Observable {
    * @return a list of points retained
    */
   def retain(points: List[Geolocatable]): List[Geolocatable] = {
-    val retained = points.filter(a => !a.known || contains(a))
+    val retained = points.filter(contains _)
     notify(Statistics.GeopolygonAccumulator(retained length))
     retained
   }

@@ -15,6 +15,7 @@ import java.util.concurrent.{Executors,TimeUnit}
  *
  */
 object Alouer {
+  private[this] val version = "1.0"
   private[this] val maxGeoLookups = 2000
     
   def main(args: Array[String]) {
@@ -32,6 +33,7 @@ object Alouer {
             println("schedule: creates and sets up a recurring task")
             println("delete: removes all map items")
             println("stats: shows current statistics")
+            println("version: shows the current version")
             println("quit: shuts down any tasks and terminates the program")
           }
           case Input("quit") => {
@@ -46,6 +48,9 @@ object Alouer {
           }
           case Input("stats") => {
             println(Statistics)
+          }
+          case Input("version") => {
+            println(version)
           }
           case Input("delete") => {
             facade deleteMapItems

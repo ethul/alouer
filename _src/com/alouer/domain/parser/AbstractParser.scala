@@ -18,7 +18,9 @@ abstract class AbstractParser(feed: String) extends RssParsable {
   def parse(): List[RssItemizable] = {
     val url = new URL(feed)
     infolog("loading rss feed: " + feed)
-    val rss = XML.load(url.openStream)
+    val connection = url.openConnection
+    connection.setRequestProperty("Accept-Language", "en-CA")
+    val rss = XML.load(connection.getInputStream)
     val items = rss \\ "item"
     
     items.map { a =>
