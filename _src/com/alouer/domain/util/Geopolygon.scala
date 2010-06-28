@@ -44,6 +44,7 @@ case class Geopolygon(geopoints: List[Geolocatable]) extends Observable {
     // the polygon, tallys the number of times the point
     // intersects. if the number of times is odd, then the
     // polygon contains the point, otherwise it does not
+    infolog("checking geolocation: " + point)
     
     // the point we are checking if it is contained
     val p = Point(point)

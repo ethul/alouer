@@ -15,7 +15,7 @@ import java.util.concurrent.{Executors,TimeUnit}
  *
  */
 object Alouer {
-  private[this] val version = "1.0"
+  private[this] val version = "1.1"
   private[this] val maxGeoLookups = 2000
     
   def main(args: Array[String]) {
@@ -30,7 +30,9 @@ object Alouer {
           case Input("help") => {
             println("available commands")
             println("help: displays this message")
-            println("schedule: creates and sets up a recurring task")
+            println("start: creates and sets up a recurring task")
+            println("stop: shuts down any running tasks")
+            println("show: show all map items")
             println("delete: removes all map items")
             println("stats: shows current statistics")
             println("version: shows the current version")
@@ -46,6 +48,14 @@ object Alouer {
             Logger.close
             exit
           }
+          case Input("stop") => {
+            scheduler.shutdown
+            if (!scheduler.awaitTermination(120L, TimeUnit.SECONDS)) {
+              println("cannot schedule, previous task not shutdown")
+              println("forcing shutdown")
+              scheduler.shutdownNow
+            }
+          }
           case Input("stats") => {
             println(Statistics)
           }
@@ -55,7 +65,10 @@ object Alouer {
           case Input("delete") => {
             facade deleteMapItems
           }
-          case Input("schedule") => {
+          case Input("show") => {
+            facade showMapItems
+          }
+          case Input("start") => {
             scheduler.scheduleWithFixedDelay(new Runnable {
               def run() {
                 if (Statistics.geolookups > maxGeoLookups) {
@@ -78,8 +91,8 @@ object Alouer {
             println("try the help command")
           }
           case Ready => {
-            print("alouer$")
-            self ! Input(Console.readLine) 
+            print("alouer$ ")
+            self ! Input(Console.readLine.stripPrefix(" ")) 
             self ! Ready
           }
         }

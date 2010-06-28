@@ -6,7 +6,7 @@ package com.alouer.domain.parser
 import com.alouer.domain.parser.impl.SimpleRssItem
 import com.alouer.service.util.Logger
 import scala.xml.{Elem,Node,XML}
-import java.net.URL
+import java.net.{URL,URLConnection}
 
 /**
  * @author ethul
@@ -14,13 +14,11 @@ import java.net.URL
  */
 abstract class AbstractParser(feed: String) extends RssParsable {
   private[this] val infolog = Logger.log(Logger.Info) _
+  private[this] val timeout = 45 * 1000
   
   def parse(): List[RssItemizable] = {
-    val url = new URL(feed)
     infolog("loading rss feed: " + feed)
-    val connection = url.openConnection
-    connection.setRequestProperty("Accept-Language", "en-CA")
-    val rss = XML.load(connection.getInputStream)
+    val rss = XML.load(connection(feed).getInputStream)
     val items = rss \\ "item"
     
     items.map { a =>
@@ -44,6 +42,14 @@ abstract class AbstractParser(feed: String) extends RssParsable {
   protected def parseDate(node: Node): String = {
     val i = node.child.indexWhere(_.label == "date")
     node.child(i).text
+  }
+  
+  protected final def connection(url: String): URLConnection = {
+    val connection = new URL(url).openConnection
+    connection.setRequestProperty("Accept-Language", "en-CA")
+    connection.setConnectTimeout(timeout)
+    connection.setReadTimeout(timeout)
+    connection
   }
   
   protected final def removeNonPrintables(value: String) = {

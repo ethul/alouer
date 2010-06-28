@@ -17,10 +17,9 @@ case class CraigslistParser(feed: String) extends AbstractParser(feed) {
   private[this] val encoding = "utf-8"
 
   protected[this] def parseAddress(link: String): String = {
-    val url = new URL(link)
-    val soup = new TagSoupFactoryAdapter
     infolog("fetching address from link: " + link)
-    val html = soup.load(url.openStream)
+    val soup = new TagSoupFactoryAdapter
+    val html = soup.load(connection(link).getInputStream)
     val as = html \\ "a"
     val i = as.indexWhere(a => a.text == "google map")
     if (i != -1) {
