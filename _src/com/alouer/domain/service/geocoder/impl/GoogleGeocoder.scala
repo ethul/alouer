@@ -18,6 +18,7 @@ case class GoogleGeocoder(geocache: Geocache[String,Geolocatable])
 extends AbstractGeocoder(geocache) with Observable {
   private[this] val info = Logger.log(Logger.Info) _
   private[this] val warn = Logger.log(Logger.Warning) _
+  private[this] val error = Logger.log(Logger.Error) _
   private[this] val OK = "OK"
   private[this] val encoding = "utf-8"
   private[this] val service = "http://maps.google.com/maps/api/geocode/xml"
@@ -27,8 +28,16 @@ extends AbstractGeocoder(geocache) with Observable {
   protected def lookup(address: String): Geolocatable = {
     info("querying geo service for address: " + address)
     val url = service + '?' + addressParam + '=' + format(address) + '&' + sensorParam
-    val xml = XML.load(connection(url))
-    val status = (xml \\ "status").text
+    val (xml, status) = try {
+      val xml = XML.load(connection(url))
+      (xml, (xml \\ "status").text)
+    }
+    catch {
+      case e: Exception => {
+        error(e)
+        (null, "")
+      }
+    }
     
     info("status was: " + status)
     

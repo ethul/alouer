@@ -13,6 +13,7 @@ import com.alouer.service.util.Logger
 case class KijijiParser(feed: String) extends AbstractParser(feed) {
   private[this] val infolog = Logger.log(Logger.Info) _
   private[this] val error = Logger.log(Logger.Error) _
+  private[this] val noaddress = ""
   
   protected[this] def parseAddress(link: String): String = {
     infolog("fetching address from link: " + link)
@@ -28,7 +29,12 @@ case class KijijiParser(feed: String) extends AbstractParser(feed) {
       }
     }
     val i = tds.indexWhere(a => a.text == "Adresse" || a.text == "Address")
-    val array = tds(i+1).text.split('\n')
-    array(0).stripPrefix(" ")
+    if (i != -1) {
+      val array = tds(i+1).text.split('\n')
+      array(0).stripPrefix(" ")
+    }
+    else {
+      noaddress
+    }
   }
 }

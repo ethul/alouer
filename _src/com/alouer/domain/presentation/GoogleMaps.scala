@@ -20,6 +20,7 @@ import java.net.{URL,URLEncoder}
  */
 case class GoogleMaps(username: String, password: String) {
   private[this] val infolog = Logger.log(Logger.Info) _
+  private[this] val error = Logger.log(Logger.Error) _
   private[this] val encoding = "utf-8"
   private[this] val application = "alouer"
   private[this] val defaultLat = "45.50706872936989"
@@ -50,8 +51,17 @@ case class GoogleMaps(username: String, password: String) {
   """
 
   infolog("getting service for " + username)
-  private[this] val service = new MapsService(application)
-  service.setUserCredentials(username, password)
+  private[this] val service = try {
+    val service = new MapsService(application)
+    service.setUserCredentials(username, password)
+    service
+  }
+  catch {
+    case e:Exception => {
+      error(e)
+      null
+    }
+  }
   
   def createFeatures(features: List[MapFeature]) {
     val feed = new URL("http://maps.google.com/maps/feeds/features/211158563591768037502/000488ebf9fe962fc40ab/full")
@@ -89,7 +99,16 @@ case class GoogleMaps(username: String, password: String) {
         "inserting feature with title " + a.title +
         "inserting feature with address " + a.address
       }
-      service.insert(feed, feature)
+
+      try {
+        service.insert(feed, feature)
+      }
+      catch {
+        case e: Exception => {
+          error(e)
+          infolog("unable to insert feature: " + a)
+        }
+      }
     }
   }
   
