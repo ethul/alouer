@@ -3,9 +3,12 @@
  */
 package com.alouer.domain
 
+import com.alouer.domain.parser.RssParsable
 import com.alouer.domain.parser.impl.{CraigslistParser,CompositeParser,KijijiParser,StatefulParserDecorator}
 import com.alouer.domain.presentation.{GoogleMaps,MapFeature}
-import com.alouer.domain.util.{Geocoder,Geolocatable,Geolocation,Geopolygon,Geocache}
+import com.alouer.domain.service.geocoder.AbstractGeocoder
+import com.alouer.domain.service.geocoder.impl.{DailyBoundedGeocoder,GoogleGeocoder,ThrottledGeocoder}
+import com.alouer.domain.util.{Geolocatable,Geolocation,Geopolygon,Geocache}
 import com.alouer.service.persistence.{Cache,FileCache}
 import com.alouer.ui._
 import com.alouer.service.util.{Logger,TimeAccessor,Statistics}
@@ -28,21 +31,28 @@ case class AlouerFacade() {
   private[this] val geocacheSeparator = "="
   private[this] val username = "montreal.alouermap"
   private[this] val password = "bF7nwO@0F"
-
-  def createMapItems() {
-    val state = FileCache[String,String](cachefile, datecacheSeparator)
-    val geocoder = Geocoder(Geocache[String,Geolocatable](FileCache[String,String](geocachefile, geocacheSeparator)))
-    val craigsParser = StatefulParserDecorator(CraigslistParser(craigs), state)
-    val kijijiParser = StatefulParserDecorator(KijijiParser(kijiji), state)
-    val compositeParser = CompositeParser(craigsParser :: kijijiParser :: Nil)
-    val polygons = GoogleMaps(username, password).getFeaturePolygons
     
-    polygons foreach { _ subscribe Statistics }
+  // initialization variables
+  private[this] var geocoder: AbstractGeocoder = _
+  private[this] var parser: RssParsable = _
+    
+  def initialize() {
+    val geocache = Geocache[String,Geolocatable](FileCache[String,String](geocachefile, geocacheSeparator))
+    geocoder = new GoogleGeocoder(geocache) with ThrottledGeocoder with DailyBoundedGeocoder
     geocoder subscribe Statistics
+    
+    val geostate = FileCache[String,String](cachefile, datecacheSeparator)
+    val craigsParser = StatefulParserDecorator(CraigslistParser(craigs), geostate)
+    val kijijiParser = StatefulParserDecorator(KijijiParser(kijiji), geostate)
     craigsParser subscribe Statistics
     kijijiParser subscribe Statistics
-    
-    val rssitems = compositeParser.parse
+    parser = CompositeParser(craigsParser :: kijijiParser :: Nil)
+  }
+
+  def createMapItems() {
+    val polygons = GoogleMaps(username, password).getFeaturePolygons
+    polygons foreach { _ subscribe Statistics }
+    val rssitems = parser.parse
     val geolocations = geocoder encode rssitems.map(_.address)
     val markers = rssitems.zip(geolocations).map { a => MapFeature(a._1, a._2) }
     val markersUnknown = markers filter { a => !a.known }

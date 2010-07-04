@@ -15,7 +15,6 @@ import java.math.MathContext
  */
 case class Geopolygon(geopoints: List[Geolocatable]) extends Observable {
   private[this] val infolog = Logger.log(Logger.Info) _
-  protected val subscribers = ListBuffer[Subscribable]()
   
   /**
    * map the geopoints to our internal point representation

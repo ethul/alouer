@@ -3,7 +3,7 @@
  */
 package com.alouer.service.util
 
-import java.io.FileWriter
+import java.io.{ByteArrayOutputStream,FileWriter,PrintStream}
 
 /**
  * @author ethul
@@ -13,8 +13,16 @@ object Logger {
   private[this] val logfile = "/home/ethul/tmp/alouer.log"
   private[this] val appender = new FileWriter(logfile, true)
 
-  def log(level: Level)(content: String) {
-    appender.write(level.prefix + content)
+  def log(level: Level)(content: Any) {
+    val formatted = content match {
+      case e: Exception => {
+        val buffer = new ByteArrayOutputStream
+        e.printStackTrace(new PrintStream(buffer))
+        buffer.toString
+      }
+      case s: String => s
+    }
+    appender.write(level.prefix + formatted)
     appender.write('\n')
     appender.flush
   }

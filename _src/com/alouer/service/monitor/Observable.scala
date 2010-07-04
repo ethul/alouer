@@ -13,7 +13,7 @@ import scala.collection.mutable.Buffer
  *
  */
 trait Observable {
-  protected val subscribers: Buffer[Subscribable]
+  private val subscribers = Buffer[Subscribable]()
   
   def subscribe(subscriber: Subscribable) {
     subscribers append subscriber

@@ -15,30 +15,36 @@ import java.util.concurrent.{Executors,TimeUnit}
  *
  */
 object Alouer {
-  private[this] val version = "1.1"
-  private[this] val maxGeoLookups = 2000
+  private[this] val version = "1.2"
     
   def main(args: Array[String]) {
     val infolog = Logger.log(Logger.Info) _
     val warnlog = Logger.log(Logger.Warning) _
     val scheduler = Executors.newSingleThreadScheduledExecutor
+    val parser = CliParser()
     val facade = AlouerFacade()
     
     val cli = actor {
       loop {
         react {
-          case Input("help") => {
-            println("available commands")
-            println("help: displays this message")
-            println("start: creates and sets up a recurring task")
-            println("stop: shuts down any running tasks")
-            println("show: show all map items")
-            println("delete: removes all map items")
-            println("stats: shows current statistics")
-            println("version: shows the current version")
-            println("quit: shuts down any tasks and terminates the program")
+          case Unknown => println("unknown command, try help")
+          case Stats => println(Statistics)
+          case Version =>  println(version)
+          case Delete => facade deleteMapItems
+          case Show => facade showMapItems
+          
+          case Start(x) => {
+            scheduler.scheduleWithFixedDelay(new Runnable {
+              def run() {
+                  Statistics.reset
+                  facade.createMapItems
+                  infolog("\n" + Statistics)
+              }
+            }, 5L, x * 60L, TimeUnit.SECONDS)
+            println("task scheduled every " + x + " minutes")
           }
-          case Input("quit") => {
+          
+          case Quit => {
             scheduler.shutdown
             if (!scheduler.awaitTermination(120L, TimeUnit.SECONDS)) {
               println("cannot schedule, previous task not shutdown")
@@ -48,57 +54,28 @@ object Alouer {
             Logger.close
             exit
           }
-          case Input("stop") => {
-            scheduler.shutdown
-            if (!scheduler.awaitTermination(120L, TimeUnit.SECONDS)) {
-              println("cannot schedule, previous task not shutdown")
-              println("forcing shutdown")
-              scheduler.shutdownNow
-            }
+          
+          case Help => {
+            println("available commands")
+            println("help: displays this message")
+            println("start: creates and sets up a recurring task")
+            println("show: show all map items")
+            println("delete: removes all map items")
+            println("stats: shows current statistics")
+            println("version: shows the current version")
+            println("quit: shuts down any tasks and terminates the program")
           }
-          case Input("stats") => {
-            println(Statistics)
-          }
-          case Input("version") => {
-            println(version)
-          }
-          case Input("delete") => {
-            facade deleteMapItems
-          }
-          case Input("show") => {
-            facade showMapItems
-          }
-          case Input("start") => {
-            scheduler.scheduleWithFixedDelay(new Runnable {
-              def run() {
-                if (Statistics.geolookups > maxGeoLookups) {
-                  warnlog(Statistics.geolookups + " is over the max number of geo lookups")
-                  warnlog("forcing shutdown at " + TimeAccessor.nowString)
-                  scheduler.shutdownNow
-                }
-                else {
-                  Statistics.reset
-                  facade.createMapItems
-                  infolog("\n" + Statistics)
-                }
-              }
-            }, 5L, 60L * 30L, TimeUnit.SECONDS)
-            
-            println("task scheduled every half hour")
-          }
-          case Input(input) => {
-            println("unknown command: " + input)
-            println("try the help command")
-          }
+          
           case Ready => {
             print("alouer$ ")
-            self ! Input(Console.readLine.stripPrefix(" ")) 
+            self ! parser.parse(Console.readLine)
             self ! Ready
           }
         }
       }
     }
     
+    facade.initialize
     cli ! Ready
   }
 }

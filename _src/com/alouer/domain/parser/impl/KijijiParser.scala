@@ -5,8 +5,6 @@ package com.alouer.domain.parser.impl
 
 import com.alouer.domain.parser.AbstractParser
 import com.alouer.service.util.Logger
-import java.net.URL
-
 
 /**
  * @author ethul
@@ -14,12 +12,21 @@ import java.net.URL
  */
 case class KijijiParser(feed: String) extends AbstractParser(feed) {
   private[this] val infolog = Logger.log(Logger.Info) _
+  private[this] val error = Logger.log(Logger.Error) _
   
   protected[this] def parseAddress(link: String): String = {
     infolog("fetching address from link: " + link)
     val soup = new TagSoupFactoryAdapter
-    val html = soup.load(connection(link).getInputStream)
-    val tds = html \\ "td"
+    val tds = try {
+      val html = soup.load(connection(link))
+      html \\ "td"
+    }
+    catch {
+      case e: Exception => {
+        error(e)
+        Nil
+      }
+    }
     val i = tds.indexWhere(a => a.text == "Adresse" || a.text == "Address")
     val array = tds(i+1).text.split('\n')
     array(0).stripPrefix(" ")

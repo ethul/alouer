@@ -7,25 +7,22 @@ import com.alouer.domain.parser.{DecoratableParser,RssItemizable,RssParsable}
 import com.alouer.service.monitor.{Notifiable,Observable,Subscribable}
 import com.alouer.service.persistence.Cache
 import com.alouer.service.util.{Logger,Md5,Statistics}
-import scala.collection.mutable.ListBuffer
 
 /**
  * @author ethul
  *
  */
-case class StatefulParserDecorator(parser: RssParsable, state: Cache[String,String]) 
-extends RssParsable 
-with DecoratableParser with Observable {
+case class StatefulParserDecorator(parser: RssParsable, state: Cache[String,String])
+extends RssParsable with DecoratableParser with Observable {
   private[this] val infolog = Logger.log(Logger.Info) _
   private[this] val zero = "0"
-  protected val subscribers = ListBuffer[Subscribable]()
     
   def feed(): String = parser feed
   
   def parse(): List[RssItemizable] = {
     var max = "0"
     val key = Md5 sum feed
-    val filtered = parser.parse.filter { a =>
+    val filtered = parser.parse filter { a =>
       val current = 
         if (state.contains(key)) {
           state.get(key) match {
