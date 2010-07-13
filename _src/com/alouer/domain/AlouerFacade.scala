@@ -23,8 +23,8 @@ import java.util.concurrent.{Executors,TimeUnit}
 case class AlouerFacade() {
   private[this] val info = Logger.log(Logger.Info) _
   private[this] val warn = Logger.log(Logger.Warning) _
-  private[this] val kijiji = "http://montreal.kijiji.ca/f-SearchAdRss?AdType=2&AddressLatitude=45.51228&AddressLongitude=-73.55439&CatId=37&Location=80002&MapAddress=Montr%C3%A9al&distance=15&maxPrice=1,000&minPrice=500&useLocalAddress=false"
-  private[this] val craigs = "http://montreal.en.craigslist.ca/search/apa?query=&minAsk=500&maxAsk=1000&bedrooms=&format=rss"
+  private[this] val kijiji = "http://montreal.kijiji.ca/f-SearchAdRss?AdType=2&AddressLatitude=45.51228&AddressLongitude=-73.55439&CatId=37&Location=80002&MapAddress=Montr%C3%A9al&distance=15&maxPrice=1,000&minPrice=700&useLocalAddress=false"
+  private[this] val craigs = "http://montreal.en.craigslist.ca/search/apa?query=&minAsk=700&maxAsk=1000&bedrooms=&format=rss"
   private[this] val cachefile = "/home/ethul/tmp/alouer.cache"
   private[this] val geocachefile = "/home/ethul/tmp/alouer.geocache"
   private[this] val datecacheSeparator = " "

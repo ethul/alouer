@@ -50,8 +50,12 @@ extends RssParsable with DecoratableParser with Observable {
     filtered
   }
   
-  private[this] def formatDate(date: String) = {
-    // 2010-06-13T20:42:27Z
-    date.take(19).replace("-","").replace(":","").replace("T","")
+  private[this] def formatDate(date: String) = date match {
+    case "" => "0"
+    case null => "0"
+    case x => {
+      // 2010-06-13T20:42:27Z
+      x.take(19).replace("-","").replace(":","").replace("T","")
+    }
   }
 }

@@ -16,12 +16,14 @@ trait DailyBoundedGeocoder extends BoundedGeocoder {
   private[this] var start = 0L
   abstract override protected def lookup(address: String): Geolocatable = {
     if (current == 0) {
-      info("started geocoding at " + start)
+      info("started geocoding at " + TimeAccessor.nowString)
       start = TimeAccessor.now
     }
     else if (TimeAccessor.now > start + dailyMillis) {
-      info("daily bound is over at " + TimeAccessor.now)
-      current = 0
+      info("daily bound is over at " + TimeAccessor.nowString)
+      // TODO: ethul, make a reset function to make this more robust
+      // next time around it will be 0 and hit the if
+      current = -1
     }
     super.lookup(address)
   }
