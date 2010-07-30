@@ -39,8 +39,8 @@ extends Cache[A,B] {
     val source = new BufferedSource(new FileInputStream(file))
     source.getLines().foreach { a =>
       val split = a.split(separator)
-      val key = split(0).asInstanceOf[A]
-      val value = split(1).asInstanceOf[B]
+      val key = split.head.asInstanceOf[A]
+      val value = split.tail.mkString(separator).asInstanceOf[B]
       cache += (key -> value)
     }
     source.close

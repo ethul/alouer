@@ -10,8 +10,11 @@ import java.io.{ByteArrayOutputStream,FileWriter,PrintStream}
  *
  */
 object Logger {
-  private[this] val logfile = "/home/ethul/tmp/alouer.log"
-  private[this] val appender = new FileWriter(logfile, true)
+  private[this] var appender: FileWriter = _
+  
+  def initialize(file: String) {
+    appender = new FileWriter(file, true)
+  }
 
   def log(level: Level)(content: Any) {
     val formatted = content match {

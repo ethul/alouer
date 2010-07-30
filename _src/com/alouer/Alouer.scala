@@ -4,10 +4,10 @@
 package com.alouer
 
 import com.alouer.domain.AlouerFacade
-import com.alouer.ui._
+import com.alouer.service.persistence.Configuration
 import com.alouer.service.util.{Logger,TimeAccessor,Statistics}
+import com.alouer.ui._
 import scala.actors.Actor._
-import java.io.FileWriter
 import java.util.concurrent.{Executors,TimeUnit}
 
 /**
@@ -15,11 +15,21 @@ import java.util.concurrent.{Executors,TimeUnit}
  *
  */
 object Alouer {
-  private[this] val version = "1.2"
+  private[this] val version = "1.5"
+  private[this] val fallback = "alouer.config"
     
   def main(args: Array[String]) {
-    val infolog = Logger.log(Logger.Info) _
-    val warnlog = Logger.log(Logger.Warning) _
+    val config = if (args.length > 0) {
+      args(0)
+    }
+    else {
+      println("no configuration file specified, using " + fallback)
+      fallback
+    }
+    Configuration.load(config, "=")
+    Logger.initialize(Configuration.get("log.file").get)
+    
+    val info = Logger.log(Logger.Info) _
     val scheduler = Executors.newSingleThreadScheduledExecutor
     val parser = CliParser()
     val facade = AlouerFacade()
@@ -38,7 +48,7 @@ object Alouer {
               def run() {
                   Statistics.reset
                   facade.createMapItems
-                  infolog("\n" + Statistics)
+                  info("\n" + Statistics)
               }
             }, 5L, x * 60L, TimeUnit.SECONDS)
             println("task scheduled every " + x + " minutes")

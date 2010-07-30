@@ -4,6 +4,7 @@
 package com.alouer.domain.presentation
 
 import com.alouer.domain.util.{Geolocation,Geopolygon}
+import com.alouer.service.persistence.Configuration
 import com.alouer.service.util.Logger
 import com.google.gdata.client.maps.MapsService
 import com.google.gdata.data.PlainTextConstruct
@@ -23,8 +24,8 @@ case class GoogleMaps(username: String, password: String) {
   private[this] val error = Logger.log(Logger.Error) _
   private[this] val encoding = "utf-8"
   private[this] val application = "alouer"
-  private[this] val defaultLat = "45.50706872936989"
-  private[this] val defaultLng = "-73.55587005615234"
+  private[this] val defaultLat = Configuration.get("google.maps.default.latitude").get
+  private[this] val defaultLng = Configuration.get("google.maps.default.longitude").get
   private[this] val kml = """
     <Placemark>
       <name>$title</name>
@@ -62,9 +63,12 @@ case class GoogleMaps(username: String, password: String) {
       null
     }
   }
+
+  private[this] val (userId, mapId) = getMap
+  infolog("using map for userId=" + userId + " with mapId=" + mapId)
   
   def createFeatures(features: List[MapFeature]) {
-    val feed = new URL("http://maps.google.com/maps/feeds/features/211158563591768037502/000488ebf9fe962fc40ab/full")
+    val feed = new URL("http://maps.google.com/maps/feeds/features/"+userId+"/"+mapId+"/full")
     features.foreach { a => 
       val feature = new FeatureEntry
       val kmlBlob = new XmlBlob
@@ -144,20 +148,6 @@ case class GoogleMaps(username: String, password: String) {
     }
   }
   
-  def listMaps() {
-    val feed = new URL("http://maps.google.com/maps/feeds/maps/default/full")
-    val result = service.getFeed(feed, classOf[MapFeed])
-    
-    println(result.getTitle.getPlainText)
-    
-    val entries = result.getEntries
-    for (i <- 0 to entries.size-1) {
-      println(entries.get(i).getId)
-      println(entries.get(i).getSelfLink.getHref)
-      println(entries.get(i).getSummary.getPlainText)
-    }
-  }
-
   def listFeatures() {
     features.foreach { a =>
       println(a.getKml.getBlob)
@@ -165,7 +155,7 @@ case class GoogleMaps(username: String, password: String) {
   }
 
   private[this] def features() = {
-    val feed = new URL("http://maps.google.com/maps/feeds/features/211158563591768037502/000488ebf9fe962fc40ab/full")
+    val feed = new URL("http://maps.google.com/maps/feeds/features/"+userId+"/"+mapId+"/full")
     val result = service.getFeed(feed, classOf[FeatureFeed])
     val buffer = new ListBuffer[FeatureEntry]
     val entries = result.getEntries
@@ -173,5 +163,25 @@ case class GoogleMaps(username: String, password: String) {
       buffer += entries.get(i)
     }
     buffer.toList
+  }
+
+  private[this] def getMap() = {
+    val feed = new URL("http://maps.google.com/maps/feeds/maps/default/full")
+    val result = service.getFeed(feed, classOf[MapFeed])
+    val target = Configuration.get("google.maps.map").get
+    
+    println(result.getTitle.getPlainText)
+    
+    val entries = result.getEntries
+    var ids: Tuple2[String,String] = ("","")
+    for (i <- 0 to entries.size-1) {
+      if (target == entries.get(i).getTitle.getPlainText) { 
+        val split = entries.get(i).getId.split("/")
+        val userid = split.init.last
+        val mapid = split.last
+        ids = (userid,mapid)
+      }
+    }
+    ids
   }
 }
