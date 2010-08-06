@@ -14,7 +14,7 @@ import java.io.{File,FileInputStream,FileWriter}
  */
 case class FileCache[A <: String, B <: String](path: String, separator: String) 
 extends Cache[A,B] {
-  private[this] val infolog = Logger.log(Logger.Info) _
+  private[this] val infolog = Logger.log(Logger.Info)
   private[this] val cache: Map[A,B] = Map()
   load()
   

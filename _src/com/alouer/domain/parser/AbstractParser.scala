@@ -13,8 +13,8 @@ import scala.xml.{Elem,Node,XML}
  */
 abstract class AbstractParser(feed: String)
 extends RssParsable with UrlConnectable {
-  private[this] val infolog = Logger.log(Logger.Info) _
-  private[this] val error = Logger.log(Logger.Error) _
+  private[this] val infolog = Logger.log(Logger.Info)
+  private[this] val error = Logger.log(Logger.Error)
   
   def parse(): List[RssItemizable] = {
     infolog("loading rss feed: " + feed)

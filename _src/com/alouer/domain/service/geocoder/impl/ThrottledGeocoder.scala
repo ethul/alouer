@@ -12,7 +12,7 @@ import com.alouer.service.util.Logger
  *
  */
 trait ThrottledGeocoder extends AbstractGeocoder {
-  private[this] val info = Logger.log(Logger.Info) _
+  private[this] val info = Logger.log(Logger.Info)
   private[this] val delay = 500
   abstract override protected def lookup(address: String): Geolocatable = {
     info("geocoder lookup being throttled by " + delay + " milliseconds")

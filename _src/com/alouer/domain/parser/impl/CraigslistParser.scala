@@ -13,8 +13,8 @@ import java.net.{URL,URLDecoder}
  *
  */
 case class CraigslistParser(feed: String) extends AbstractParser(feed) {
-  private[this] val infolog = Logger.log(Logger.Info) _
-  private[this] val error = Logger.log(Logger.Error) _
+  private[this] val infolog = Logger.log(Logger.Info)
+  private[this] val error = Logger.log(Logger.Error)
   private[this] val noaddress = ""
   private[this] val encoding = "utf-8"
 

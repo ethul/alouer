@@ -11,7 +11,7 @@ import com.alouer.service.util.{Logger,TimeAccessor}
  *
  */
 trait DailyBoundedGeocoder extends BoundedGeocoder {
-  private[this] val info = Logger.log(Logger.Info) _
+  private[this] val info = Logger.log(Logger.Info)
   private[this] val dailyMillis = 24L * 60L * 60L * 1000L
   private[this] var start = 0L
   abstract override protected def lookup(address: String): Geolocatable = {

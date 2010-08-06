@@ -12,8 +12,8 @@ import com.alouer.service.util.Logger
  *
  */
 trait BoundedGeocoder extends AbstractGeocoder {
-  private[this] val info = Logger.log(Logger.Info) _
-  private[this] val warn = Logger.log(Logger.Warning) _
+  private[this] val info = Logger.log(Logger.Info)
+  private[this] val warn = Logger.log(Logger.Warning)
   private[this] val bound = 2450
   protected var current = 0
   abstract override protected def lookup(address: String): Geolocatable = {

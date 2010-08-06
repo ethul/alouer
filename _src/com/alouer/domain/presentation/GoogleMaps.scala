@@ -20,8 +20,8 @@ import java.net.{URL,URLEncoder}
  *
  */
 case class GoogleMaps(username: String, password: String) {
-  private[this] val infolog = Logger.log(Logger.Info) _
-  private[this] val error = Logger.log(Logger.Error) _
+  private[this] val infolog = Logger.log(Logger.Info)
+  private[this] val error = Logger.log(Logger.Error)
   private[this] val encoding = "utf-8"
   private[this] val application = "alouer"
   private[this] val defaultLat = Configuration.get("google.maps.default.latitude").get
@@ -58,13 +58,22 @@ case class GoogleMaps(username: String, password: String) {
     service
   }
   catch {
-    case e:Exception => {
+    case e: Exception => {
       error(e)
       null
     }
   }
 
-  private[this] val (userId, mapId) = getMap
+  private[this] val (userId, mapId) = try {
+    getMap  
+  }
+  catch {
+    case e: Exception => {
+      error(e)
+      ("","")
+    }
+  }
+  
   infolog("using map for userId=" + userId + " with mapId=" + mapId)
   
   def createFeatures(features: List[MapFeature]) {
@@ -169,9 +178,6 @@ case class GoogleMaps(username: String, password: String) {
     val feed = new URL("http://maps.google.com/maps/feeds/maps/default/full")
     val result = service.getFeed(feed, classOf[MapFeed])
     val target = Configuration.get("google.maps.map").get
-    
-    println(result.getTitle.getPlainText)
-    
     val entries = result.getEntries
     var ids: Tuple2[String,String] = ("","")
     for (i <- 0 to entries.size-1) {

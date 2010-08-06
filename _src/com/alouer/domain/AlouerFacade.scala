@@ -17,14 +17,15 @@ import com.alouer.service.util.{Logger,TimeAccessor,Statistics}
  *
  */
 case class AlouerFacade() {
-  private[this] val info = Logger.log(Logger.Info) _
-  private[this] val warn = Logger.log(Logger.Warning) _
+  private[this] val info = Logger.log(Logger.Info)
+  private[this] val warn = Logger.log(Logger.Warning)
   private[this] val rsscacheSeparator = " "
   private[this] val geocacheSeparator = "="
     
   // initialization variables
   private[this] var geocoder: AbstractGeocoder = _
   private[this] var parser: RssParsable = _
+  private[this] var maps: GoogleMaps = _
     
   def initialize() {
     val geocachefile = Configuration.get("google.maps.geocache").get
@@ -41,12 +42,14 @@ case class AlouerFacade() {
     craigsParser subscribe Statistics
     kijijiParser subscribe Statistics
     parser = CompositeParser(craigsParser :: kijijiParser :: Nil)
+    
+    val username = Configuration.get("google.maps.username").get
+    val password = Configuration.get("google.maps.password").get
+    maps = GoogleMaps(username, password)
   }
 
   def createMapItems() {
-    val username = Configuration.get("google.maps.username").get
-    val password = Configuration.get("google.maps.password").get
-    val polygons = GoogleMaps(username, password).getFeaturePolygons
+    val polygons = maps.getFeaturePolygons
     polygons foreach { _ subscribe Statistics }
     val rssitems = parser.parse
     val geolocations = geocoder encode rssitems.map(_.address)
@@ -54,18 +57,14 @@ case class AlouerFacade() {
     val markersUnknown = markers filter { a => !a.known }
     val markersInPolygon = polygons flatMap { _ retain markers }
     val markersToMap = markersInPolygon ::: markersUnknown
-    GoogleMaps(username, password) createFeatures markersToMap.asInstanceOf[List[MapFeature]]
+    maps createFeatures markersToMap.asInstanceOf[List[MapFeature]]
   }
   
   def deleteMapItems() {
-    val username = Configuration.get("google.maps.username").get
-    val password = Configuration.get("google.maps.password").get
-    GoogleMaps(username, password) deleteFeatures
+    maps deleteFeatures
   }
   
   def showMapItems() {
-    val username = Configuration.get("google.maps.username").get
-    val password = Configuration.get("google.maps.password").get
-    GoogleMaps(username, password) listFeatures
+    maps listFeatures
   }
 }

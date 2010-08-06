@@ -16,9 +16,9 @@ import java.net.{URL,URLEncoder}
  */
 case class GoogleGeocoder(geocache: Geocache[String,Geolocatable]) 
 extends AbstractGeocoder(geocache) with Observable {
-  private[this] val info = Logger.log(Logger.Info) _
-  private[this] val warn = Logger.log(Logger.Warning) _
-  private[this] val error = Logger.log(Logger.Error) _
+  private[this] val info = Logger.log(Logger.Info)
+  private[this] val warn = Logger.log(Logger.Warning)
+  private[this] val error = Logger.log(Logger.Error)
   private[this] val OK = "OK"
   private[this] val encoding = "utf-8"
   private[this] val service = "http://maps.google.com/maps/api/geocode/xml"

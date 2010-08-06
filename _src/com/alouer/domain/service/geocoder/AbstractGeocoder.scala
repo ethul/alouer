@@ -16,8 +16,8 @@ import java.net.URLEncoder
  */
 abstract class AbstractGeocoder(geocache: Geocache[String,Geolocatable])
 extends UrlConnectable with Observable {
-  private[this] val info = Logger.log(Logger.Info) _
-  private[this] val warn = Logger.log(Logger.Warning) _
+  private[this] val info = Logger.log(Logger.Info)
+  private[this] val warn = Logger.log(Logger.Warning)
     
   def encode(address: String): Geolocatable = {
     if (address == null || address == "") {

@@ -14,7 +14,7 @@ import com.alouer.service.util.{Logger,Md5,Statistics}
  */
 case class StatefulParserDecorator(parser: RssParsable, state: Cache[String,String])
 extends RssParsable with DecoratableParser with Observable {
-  private[this] val infolog = Logger.log(Logger.Info) _
+  private[this] val infolog = Logger.log(Logger.Info)
   private[this] val zero = "0"
     
   def feed(): String = parser feed

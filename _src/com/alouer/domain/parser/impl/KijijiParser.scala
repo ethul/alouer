@@ -11,8 +11,8 @@ import com.alouer.service.util.Logger
  *
  */
 case class KijijiParser(feed: String) extends AbstractParser(feed) {
-  private[this] val infolog = Logger.log(Logger.Info) _
-  private[this] val error = Logger.log(Logger.Error) _
+  private[this] val infolog = Logger.log(Logger.Info)
+  private[this] val error = Logger.log(Logger.Error)
   private[this] val noaddress = ""
   
   protected[this] def parseAddress(link: String): String = {

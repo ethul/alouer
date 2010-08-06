@@ -29,7 +29,7 @@ object Alouer {
     Configuration.load(config, "=")
     Logger.initialize(Configuration.get("log.file").get)
     
-    val info = Logger.log(Logger.Info) _
+    val info = Logger.log(Logger.Info)
     val scheduler = Executors.newSingleThreadScheduledExecutor
     val parser = CliParser()
     val facade = AlouerFacade()

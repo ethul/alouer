@@ -15,19 +15,27 @@ object Logger {
   def initialize(file: String) {
     appender = new FileWriter(file, true)
   }
-
-  def log(level: Level)(content: Any) {
-    val formatted = content match {
-      case e: Exception => {
-        val buffer = new ByteArrayOutputStream
-        e.printStackTrace(new PrintStream(buffer))
-        buffer.toString
-      }
-      case s: String => s
+  
+  /**
+   * <p>
+   * the apply of the function this method returns depends on
+   * the type class LogFormatter. the point of this class is
+   * to apply the correct format method based on the type of
+   * A which is passed to be logged
+   * 
+   * <p>
+   * thanks to the clever users of the scala-user mailing list
+   * i have an answer for allowing for what appears to be a
+   * partially applied function. but really one function is
+   * returning another which will be executed later
+   */
+  def log(level: Level) = new {
+    def apply[A: LogFormatter](a: A) {
+      val formatted = implicitly[LogFormatter[A]].format(a)
+      appender.write(level.prefix + formatted)
+      appender.write('\n')
+      appender.flush
     }
-    appender.write(level.prefix + formatted)
-    appender.write('\n')
-    appender.flush
   }
   
   def close() {
