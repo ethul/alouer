@@ -1,3 +1,5 @@
+_lib
+_lib/*
 _output
 _output/*
 .scala_dependencies
