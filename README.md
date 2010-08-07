@@ -23,7 +23,7 @@ urls are the only ones really needed:
    * gdata-base-1.0.jar
    * gdata-core-1.0.jar
    * gdata-media-1.0.jar
- * guava-r05.zip [http://guava-libraries.googlecode.com/files/guava-r05.zip]
+ * http://guava-libraries.googlecode.com/files/guava-r05.zip
    * guava-r05.jar
  * http://www.oracle.com/technetwork/java/index-138643.html
    * mail.jar
