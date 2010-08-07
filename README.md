@@ -16,6 +16,7 @@ directory as the alouer jar).
 
 download the following third-party jars. the jars listed below the 
 urls are the only ones really needed:
+
  * http://code.google.com/p/gdata-java-client/downloads/detail?name=gdata.java-1.41.3.zip
    * gdata-client-1.0.jar
    * gdata-maps-2.0.jar
@@ -65,6 +66,7 @@ to run the program (where x is the version you downloaded):
   java -jar alouer-x.jar /path/to/your/config.file
 
 you should arrive at a command prompt. the available commands are:
+
  * help, which displays all the commands
  * start [frequency], which starts processing at the given frequency in minutes
  * show, which displays all map entries and polygons
