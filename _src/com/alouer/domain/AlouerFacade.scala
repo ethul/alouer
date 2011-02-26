@@ -52,12 +52,13 @@ case class AlouerFacade() {
     val polygons = maps.getFeaturePolygons
     polygons foreach { _ subscribe Statistics }
     val rssitems = parser.parse
-    val geolocations = geocoder encode rssitems.map(_.address)
-    val markers = rssitems.zip(geolocations).map { a => MapFeature(a._1, a._2) }
-    val markersUnknown = markers filter { a => !a.known }
-    val markersInPolygon = polygons flatMap { _ retain markers }
-    val markersToMap = markersInPolygon ::: markersUnknown
-    maps createFeatures markersToMap.asInstanceOf[List[MapFeature]]
+    //val geolocations = geocoder encode rssitems.map(_.address)
+    //val markers = rssitems.zip(geolocations).map { a => MapFeature(a._1, a._2) }
+    //val markersUnknown = markers filter { a => !a.known }
+    //val markersInPolygon = polygons flatMap { _ retain markers }
+    //val markersToMap = markersInPolygon ::: markersUnknown
+    //maps createFeatures markersToMap.asInstanceOf[List[MapFeature]]
+    maps createFeatures rssitems
   }
   
   def deleteMapItems() {

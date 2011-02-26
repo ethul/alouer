@@ -15,7 +15,7 @@ import java.util.concurrent.{Executors,TimeUnit}
  *
  */
 object Alouer {
-  private[this] val version = "1.5"
+  private[this] val version = "1.6"
   private[this] val fallback = "alouer.config"
     
   def main(args: Array[String]) {
