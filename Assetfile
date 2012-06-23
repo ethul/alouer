@@ -1,0 +1,63 @@
+require "rake-pipeline-web-filters"
+
+input "assets" do
+  output "public"
+
+  match "javascripts/*.roy" do
+    roy
+  end
+
+  match "javascripts/*.js" do
+    concat ["javascripts/prelude.js"], "javascripts/main.js"
+    if ENV["RAKEP_MINIFY"]
+      uglify do |input|
+        input.sub("min.", "")
+      end
+    end
+  end
+
+  match "stylesheets/*.scss" do
+    sass
+    if ENV["RAKEP_MINIFY"]
+      yui_css do |input|
+        input.sub("min.", "")
+      end
+    end
+  end
+
+  match "vendor/modernizr*.js" do
+    if ENV["RAKEP_MINIFY"]
+      uglify do |input|
+        input.sub(%r{vendor/.*\.js}, "javascripts/modernizr.js")
+      end
+    else
+      copy do |input|
+        input.sub(%r{vendor/.*\.js}, "javascripts/modernizr.js")
+      end
+    end
+  end
+
+  match "vendor/{jquery-1.7.2,gmaps-0.1.12.5}.js" do
+    concat ["vendor/jquery-1.7.2.js"], "javascripts/vendor.js"
+    if ENV["RAKEP_MINIFY"]
+      uglify do |input|
+        input.sub("min.", "")
+      end
+    end
+  end
+
+  match "vendor/{html5bp-3.0}.css" do
+    concat "stylesheets/vendor.css"
+    if ENV["RAKEP_MINIFY"]
+      yui_css do |input|
+        input.sub("min.", "")
+      end
+    end
+  end
+
+  match "statics/*.*" do
+    copy do |input|
+      input.sub "statics/", ""
+    end
+  end
+end

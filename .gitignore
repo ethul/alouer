@@ -1,5 +1,4 @@
-_lib
-_lib/*
-_output
-_output/*
-.scala_dependencies
+.*swp
+.sass-cache/
+node_modules/
+tmp/
