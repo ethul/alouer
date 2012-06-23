@@ -1,0 +1,40 @@
+let GMaps = Alouer.factory.gmaps
+let DrawingManager = Alouer.factory.drawingManager
+
+($ document).ready (\() ->
+  let map = GMaps {
+    div: "#map"
+    lat: 45.4214
+    lng: -75.6919
+    width: (($ window).width ()) ++ "px"
+    height: (($ window).height ()) ++ "px"
+  }
+
+  let drawing = DrawingManager {
+    drawingControlOptions: {
+      drawingModes: [google.maps.drawing.OverlayType.POLYGON]
+    }
+    polygonOptions: {
+      fillColor: "red"
+      fillOpacity: 0.25
+      strokeWeight: 1
+      clickable: false
+      editable: true
+    }
+  }
+
+  let handler path =
+    path.forEach (\a ->
+      console.log (a.toString ())
+    )
+
+  google.maps.event.addListener drawing "polygoncomplete" (\polygon ->
+    let path = polygon.getPath ()
+    google.maps.event.addListener path "set_at" (\() -> handler path)
+    google.maps.event.addListener path "insert_at" (\() -> handler path)
+    google.maps.event.addListener path "remove_at" (\() -> handler path)
+    handler path
+  )
+
+  drawing.setMap map.map
+)
