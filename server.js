@@ -1,15 +1,12 @@
 var express = require("express")
   , gzippo = require("gzippo")
-  , http = require("http");
+  , alouer = require("./app/alouer")
+  , app = express();
 
-var app = express();
-
-app.configure(function(){
-  app.set("port", process.env.PORT || 5000);
-  app.use(express.bodyParser());
-  app.use(express.methodOverride());
-  app.use(express.logger("dev"));
-});
+app.use(express.bodyParser());
+app.use(express.methodOverride());
+app.use(express.logger("dev"));
+app.use(express.favicon());
 
 app.configure("development", function(){
   app.use(express.errorHandler());
@@ -24,12 +21,19 @@ app.configure("production", function(){
   }));
 });
 
-app.get("/", function(req,res){
+app.get("/", function(req, res){
   res.sendfile(__dirname + "/public/index.html");
 });
 
-http.createServer(app).listen(app.get("port"), function(){
-  var port = app.get("port")
-  var env = process.env.NODE_ENV || "development";
-  console.log("Express server listening on port " + port + " in " + env);
+app.get("/apartments", function(req, res){
+  alouer.apartments(function(body){
+    res.json(200, body);
+  });
 });
+
+var port = process.env.PORT || 5000
+  , env = process.env.NODE_ENV || "development";
+
+app.listen(port);
+
+console.log("Express server listening on port " + port + " in " + env);
