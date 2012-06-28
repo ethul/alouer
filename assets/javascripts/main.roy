@@ -1,8 +1,28 @@
-let GMaps = Alouer.factory.gmaps
-let DrawingManager = Alouer.factory.drawingManager
+
+data Maybe a = Nothing | Just a
+
+let maybeMonad = {
+  return: \a -> Just a
+  bind: \ma f -> match ma
+    case Nothing = Nothing ()
+    case (Just a) = f a
+}
+
+let deferredMonad = {
+  return: $.when
+  bind: \ma f ->
+    let defer = $.Deferred ()
+    ma.done (\a -> (f a).done defer.resolve)
+    defer.promise ()
+}
+
+let liftDeferred f =
+  let defer = $.Deferred ()
+  f defer
+  defer.promise ()
 
 ($ document).ready (\() ->
-  let map = GMaps {
+  let map = (new GMaps) {
     div: "#map"
     lat: 45.4214
     lng: -75.6919
@@ -10,7 +30,7 @@ let DrawingManager = Alouer.factory.drawingManager
     height: (($ window).height ()) ++ "px"
   }
 
-  let drawing = DrawingManager {
+  let drawing = (new google.maps.drawing.DrawingManager) {
     drawingControlOptions: {
       drawingModes: [google.maps.drawing.OverlayType.POLYGON]
     }
@@ -37,4 +57,13 @@ let DrawingManager = Alouer.factory.drawingManager
   )
 
   drawing.setMap map.map
+)
+
+($ document).ready (\() ->
+  let res = do deferredMonad
+    apts <- $.get "/apartments"
+    console.log apts
+    return apts
+
+  res
 )

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<rdf:RDF
+ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+ xmlns="http://purl.org/rss/1.0/"
+ xmlns:ev="http://purl.org/rss/1.0/modules/event/"
+ xmlns:content="http://purl.org/rss/1.0/modules/content/"
+ xmlns:taxo="http://purl.org/rss/1.0/modules/taxonomy/"
+ xmlns:dc="http://purl.org/dc/elements/1.1/"
+ xmlns:syn="http://purl.org/rss/1.0/modules/syndication/"
+ xmlns:dcterms="http://purl.org/dc/terms/"
+ xmlns:admin="http://webns.net/mvcb/"
+>
+
+<channel rdf:about="http://ottawa.en.craigslist.ca/apa/index.rss">
+<title>craigslist | apts/housing for rent in ottawa-hull-gatineau</title>
+<link>http://ottawa.en.craigslist.ca/apa/</link>
+<description></description>
+<dc:language>en-us</dc:language>
+<dc:rights>Copyright &#x26;copy; 2012 craigslist, inc.</dc:rights>
+<dc:publisher>robot@craigslist.org</dc:publisher>
+<dc:creator>robot@craigslist.org</dc:creator>
+<dc:source>http://ottawa.en.craigslist.ca/apa/index.rss</dc:source>
+<dc:title>craigslist | apts/housing for rent in ottawa-hull-gatineau</dc:title>
+<dc:type>Collection</dc:type>
+<syn:updateBase>2012-06-25T17:10:41-04:00</syn:updateBase>
+<syn:updateFrequency>4</syn:updateFrequency>
+<syn:updatePeriod>hourly</syn:updatePeriod>
+<items>
+ <rdf:Seq>
+  <rdf:li rdf:resource="http://ottawa.en.craigslist.ca/apa/3100764413.html" />
+ </rdf:Seq>
+</items>
+</channel>
+<item rdf:about="http://ottawa.en.craigslist.ca/apa/3100764413.html">
+<title><![CDATA[1 br, furnished, very big and bright, recently reno'd. (ottawa ) $799 1bd]]></title>
+<link>http://ottawa.en.craigslist.ca/apa/3100764413.html</link>
+<description><![CDATA[close to st laurent mall, close transit and shopping, big, bright, recently reno'd, fully furnished.   includes parking, laundry, heat and hydro !located in basement of owner occupied bungalow.  sorry no pets.  Available JULY 1st <!-- START CLTAGS -->
+<br>
+
+			<!-- CLTAG xstreet0=252 queen mary street -->
+			<!-- CLTAG xstreet1= -->
+			<!-- CLTAG city=ottawa -->
+			<!-- CLTAG region=on -->
+			252 queen mary street
+			<small>
+				(<a target="_blank" href="http://maps.google.com/?q=loc%3A+%32%35%32+queen+mary+street+ottawa+on+CA">google map</a>)
+				(<a target="_blank" href="http://maps.yahoo.com/maps_result?addr=%32%35%32+queen+mary+street&amp;csz=ottawa+on&amp;country=CA">yahoo map</a>)
+			</small>
+		<ul class="blurbs">
+<li> <!-- CLTAG GeographicArea=ottawa  -->Location: ottawa </li>
+<li>it's NOT ok to contact this poster with services or other commercial interests</li></ul>
+<!-- END CLTAGS -->]]></description>
+<dc:date>2012-06-25T17:03:21-04:00</dc:date>
+<dc:language>en-us</dc:language>
+<dc:rights>Copyright &#x26;copy; 2012 craigslist, inc.</dc:rights>
+<dc:source>http://ottawa.en.craigslist.ca/apa/3100764413.html</dc:source>
+<dc:title><![CDATA[1 br, furnished, very big and bright, recently reno'd. (ottawa ) $799 1bd]]></dc:title>
+<dc:type>text</dc:type>
+<dcterms:issued>2012-06-25T17:03:21-04:00</dcterms:issued>
+</item>
+</rdf:RDF>

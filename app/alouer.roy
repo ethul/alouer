@@ -1,0 +1,149 @@
+let request = require "request"
+let libxmljs = require "libxmljs"
+let deferred = require "JQDeferred"
+let htmlparser = require "htmlparser"
+let url = require "url"
+let uuid = require "node-uuid"
+let geo = require "geo"
+
+data Maybe a = Nothing | Just a
+
+let feed = "http://ottawa.en.craigslist.ca/apa/index.rss"
+
+let namespace = {
+  rdf: "http://purl.org/rss/1.0/"
+  dc: "http://purl.org/dc/elements/1.1/"
+}
+
+let id a = a
+
+let deferredMonad = {
+  return: \a ->
+    deferred.when a
+  bind: \ma f ->
+    let defer = deferred ()
+    ma.done (\a -> (f a).done defer.resolve)
+    defer.promise ()
+}
+
+let liftDeferred f =
+  let defer = deferred ()
+  f defer
+  defer.promise ()
+
+let liftDeferredArray dfds =
+  let defer = deferred ()
+  (deferred.when.apply null dfds).done (\_ ->
+    defer.resolve (Array.prototype.slice.call arguments 0)
+  )
+  defer.promise ()
+
+let runDeferred defer f =
+  defer.done f
+
+let maybeMonad = {
+  return: \a -> Just a
+  bind: \ma f -> match ma
+    case Nothing = Nothing
+    case (Just a) = f a
+}
+
+let rdfTextFromEl el = (\tag ->
+  (el.get ("rdf:" ++ tag) namespace).text ()
+)
+
+let dcTextFromEl el = (\tag ->
+  (el.get ("dc:" ++ tag) namespace).text ()
+)
+
+let parseAddressHref dom =
+  dom.reduce (\res el ->
+    if isSmall el then
+      el.children.reduce (\res el ->
+        if isGoogleA el then
+          Just (extractLoc el.attribs.href)
+        else
+          res
+      ) (Nothing ())
+    else
+      res
+  ) (Nothing ())
+where
+  isSmall el =
+    (el.type == "tag") && (el.raw == "small")
+  isGoogleA el =
+    (el.type == "tag") && (el.name == "a") && (el.raw.indexOf "google") != -1
+  extractLoc href =
+    (url.parse href true).query.q.substr 5
+
+let parseAddressCltag dom =
+  (dom.filter isBlurbs).reduce (\res el ->
+    el.children.reduce(\res el ->
+      let value = extractFromChild el res
+      match value
+       case (Just a) = Just a
+       case Nothing = res
+    ) (Nothing ())
+  ) (Nothing ())
+where
+  isBlurbs el =
+    (el.raw.indexOf "ul class=\"blurbs\"") != -1
+  extractFromChild el res =
+    if el.children != undefined then
+      el.children.reduce (\res el ->
+        if containsGeo el then
+          Just (extractGeo el)
+        else
+          res
+      ) (Nothing ())
+    else
+      res
+  where
+    containsGeo el =
+      (el.raw.indexOf "CLTAG GeographicArea") != -1
+    extractGeo el =
+      el.raw.substr ((el.raw.indexOf "=") + 1)
+
+let parseDom html =
+  let handler = (new htmlparser).DefaultHandler id
+  ((new htmlparser).Parser handler).parseComplete html
+  handler.dom
+
+let parseAddress html = 
+  let dom = parseDom html
+  let fromHref = parseAddressHref dom
+  match fromHref
+    case Nothing = parseAddressCltag dom
+    case (Just a) = Just a
+
+let parseToApt item =
+  let dc = dcTextFromEl item
+  let rdf = rdfTextFromEl item
+  let addr = parseAddress (rdf "description")
+  {
+    id: uuid.v4 ()
+    title: rdf "title"
+    description: rdf "description"
+    url: rdf "link"
+    posted: dc "date"
+    address: addr
+  }
+
+let geocode apt = liftDeferred (\defer ->
+  match apt.address
+    case Nothing = defer.resolve (apt with {lat: 0, lng: 0, address: ""})
+    case (Just a) = geo.geocoder geo.google a false (\a lat lng z ->
+      defer.resolve (apt with {lat: lat, lng: lng, address: a})
+    )
+)
+
+let apartments = \f -> runDeferred (do deferredMonad
+  body  <- liftDeferred (\defer -> request feed (\_ _ body -> defer.resolve body))
+  doc   <- deferredMonad.return (libxmljs.parseXmlString body)
+  items <- deferredMonad.return ((doc.root ()).find "rdf:item" namespace)
+  apts  <- deferredMonad.return (items.map parseToApt)
+  geos  <- liftDeferredArray (apts.map geocode)
+  return geos
+) f
+
+export apartments

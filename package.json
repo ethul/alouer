@@ -7,7 +7,18 @@
   },
   "dependencies": {
     "express": ">= 3.0.0beta2",
-    "gzippo": ">= 0.1.4"
+    "gzippo": ">= 0.1.4",
+    "request": ">= 2.9.202",
+    "libxmljs": ">= 0.5.4",
+    "JQDeferred": ">= 1.7.2",
+    "htmlparser": ">= 1.7.6",
+    "node-uuid": ">= 1.3.3",
+    "geo": ">= 0.0.3"
+  },
+  "devDependencies": {
+    "vows": ">= 0.6.2",
+    "sinon": ">= 1.3.4",
+    "injectr": ">= 0.3.1"
   },
   "engines": {
     "node": ">= 0.5.0 < 0.7.0"

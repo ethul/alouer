@@ -1,5 +1,12 @@
 require "rake-pipeline-web-filters"
 
+input "app" do
+  output "app"
+  match "*.roy" do
+    roy(nodejs: true)
+  end
+end
+
 input "assets" do
   output "public"
 
@@ -8,18 +15,9 @@ input "assets" do
   end
 
   match "javascripts/*.js" do
-    concat ["javascripts/prelude.js"], "javascripts/main.js"
+    concat "javascripts/main.js"
     if ENV["RAKEP_MINIFY"]
       uglify do |input|
-        input.sub("min.", "")
-      end
-    end
-  end
-
-  match "stylesheets/*.scss" do
-    sass
-    if ENV["RAKEP_MINIFY"]
-      yui_css do |input|
         input.sub("min.", "")
       end
     end
